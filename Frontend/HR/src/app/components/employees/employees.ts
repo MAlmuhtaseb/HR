@@ -10,6 +10,7 @@ import { List } from '../../interfaces/list-interface';
 import { DepartmentsService } from '../../services/departments.service';
 import { LookupsService } from '../../services/lookups.service';
 import { LookupsMajorCodes } from '../../enums/major-codes';
+import { from } from 'rxjs';
 @Component({
   selector: 'app-employees',
   imports: [CommonModule, ReactiveFormsModule, NgxPaginationModule, ConfirmationDialog],
@@ -20,6 +21,7 @@ import { LookupsMajorCodes } from '../../enums/major-codes';
 export class Employees implements OnInit  {
 
   @ViewChild ('closeButton') closeButton: ElementRef | undefined;// Get Element By ID
+  @ViewChild ('empImageInput') empImageInput !: ElementRef;
 
   employees : Employee[] = [];
 
@@ -47,7 +49,8 @@ export class Employees implements OnInit  {
     Manager: new FormControl(null),
     Position: new FormControl(null, [Validators.required]),
     IsActive: new FormControl(true, [Validators.required]),
-    Image: new FormControl(null)
+    Image: new FormControl(null),
+    IsImage: new FormControl(false)
   });
 
   searchFilterForm: FormGroup = new FormGroup({
@@ -115,7 +118,9 @@ export class Employees implements OnInit  {
               departmentId: x.departmentId,
               departmentName: x.departmentName,
               managerId: x.managerId,
-              managerName: x.managerName
+              managerName: x.managerName,
+              imagePath: x.imagePath ? x.imagePath.replaceAll("\\", "/") : "assets/images/emp-default-image.avif",
+              isImage: x.imagePath ? true : false
             };
             this.employees.push(employee);
           });
@@ -204,7 +209,8 @@ export class Employees implements OnInit  {
       departmentId: this.employeeForm.value.Department,
       managerId: this.employeeForm.value.Manager,
       positionId: this.employeeForm.value.Position,
-      image: this.employeeForm.value.Image
+      image: this.employeeForm.value.Image,
+      isImage: this.employeeForm.value.IsImage
     };
 
     if(!this.employeeForm.value.Id){// Add Employee
@@ -235,12 +241,20 @@ export class Employees implements OnInit  {
     this.clearEmployeeForm();
   }
 
+  clearInputImage(){
+    this.empImageInput.nativeElement.value = ''; // Cleare Selected Image
+  }
+
   clearEmployeeForm(){
 
     this.employeeForm.reset({
-      IsActive: true
+      IsActive: true,
+      IsImage : false
     });
+
+    this.clearInputImage();
   }
+  
 
 
   editEmployee(id: number){
@@ -257,7 +271,8 @@ export class Employees implements OnInit  {
         Department: employee?.departmentId,
         Manager: employee?.managerId,
         Position: employee?.positionId,
-        IsActive: employee?.isActive
+        IsActive: employee?.isActive,
+        IsImage: employee?.isImage
       })
     }
   }
@@ -297,6 +312,11 @@ export class Employees implements OnInit  {
     this.showConfirmationDialog = false; // hide confirmation dialog
   }
 
+  removeImage(){
+    this.employeeForm.patchValue({
+      IsImage : false
+    })
+  }
 
   loadSaveDialog(employeeId?: number){
     this.clearEmployeeForm();

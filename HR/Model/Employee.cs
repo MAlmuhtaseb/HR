@@ -31,5 +31,6 @@ namespace HR.Model
         [ForeignKey("User")]
         public long? UserId { get; set; }
         public User? User { get; set; } // Navigation Proprtey
+        public string? ImagePath { get; set; }
     }
 }

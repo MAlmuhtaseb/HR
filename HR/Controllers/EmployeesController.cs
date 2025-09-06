@@ -15,11 +15,15 @@ namespace HR.Controllers
     public class EmployeesController : ControllerBase
     {
         private HrDbContext _dbContext;
+        private IWebHostEnvironment _env;
+        private IConfiguration _config;
 
-        public EmployeesController(HrDbContext dbContext) // Constructor
+        public EmployeesController(HrDbContext dbContext, IWebHostEnvironment env, IConfiguration config) // Constructor
         {
 
             _dbContext = dbContext;
+            _env = env;
+            _config = config;
         }
 
         //[Authorize(Roles = "HR,Admin")]
@@ -51,7 +55,8 @@ namespace HR.Controllers
                                 ManagerId = employee.ManagerId,
                                 ManagerName = manager.Name,
                                 DepartmentId = employee.DepartmentId,
-                                DepartmentName = department.Name
+                                DepartmentName = department.Name,
+                                ImagePath = employee.ImagePath != null ? Path.Combine(_config["BaseUrl"], employee.ImagePath) : ""
                             };
             return Ok(data);
             }
@@ -95,7 +100,7 @@ namespace HR.Controllers
         }
 
         [HttpPost("Add")]
-        public IActionResult Add([FromBody] SaveEmployeeDto employeeDto )
+        public IActionResult Add([FromForm] SaveEmployeeDto employeeDto )
         {
 
             try
@@ -128,8 +133,14 @@ namespace HR.Controllers
                     EndDate = employeeDto.EndDate,
                     DepartmentId = employeeDto.DepartmentId,
                     ManagerId = employeeDto.ManagerId,
-                    User = user
+                    User = user,
+                    ImagePath = null
                 };
+
+                if (employeeDto.Image != null)
+                {
+                    employee.ImagePath = UploadImage(employeeDto.Image);
+                }
 
                 _dbContext.Employees.Add(employee);
                 _dbContext.SaveChanges();
@@ -143,7 +154,7 @@ namespace HR.Controllers
         }
 
         [HttpPut("Update")]
-        public IActionResult Update([FromBody] SaveEmployeeDto employeeDto)
+        public IActionResult Update([FromForm] SaveEmployeeDto employeeDto)
         {
 
 
@@ -166,8 +177,19 @@ namespace HR.Controllers
                 employee.DepartmentId = employeeDto.DepartmentId;
                 employee.ManagerId = employeeDto.ManagerId;
 
+                if(employeeDto.Image != null)
+                {
+                    employee.ImagePath = UploadImage(employeeDto.Image);
+                }
+                else if(employeeDto.Image == null  && employeeDto.IsImage == false)
+                {
+                    employee.ImagePath = null;
+                }
 
-                _dbContext.SaveChanges();
+
+
+
+                    _dbContext.SaveChanges();
                 return Ok();
             }
             catch (Exception ex)
@@ -222,6 +244,38 @@ namespace HR.Controllers
                        };
 
             return Ok(data);
+
+        }
+
+
+        private string UploadImage(IFormFile Image)
+        {
+           // folderPath = "D:\\Attachments\\EmployeeImages";
+            var imagesFolderPath = Path.Combine("Atttachments", "EmployeeImages");
+
+            var folderPath = Path.Combine(_env.WebRootPath, imagesFolderPath);
+            //"D:\\HR\\HR\\wwwroot"
+
+            if (!Directory.Exists(folderPath))
+            {
+                //Create Folder
+                Directory.CreateDirectory(folderPath);
+            }
+
+            var fileExtnesion = Path.GetExtension(Image.FileName); // .png, .jpg, .jpeg .....
+            var fileName = Guid.NewGuid() + fileExtnesion; // 23f45e89-8b5a-5c55-9df7-240d78a3ce15 + .png
+
+            var filePath = Path.Combine(folderPath, fileName);
+            // D:\\HR\\HR\\wwwroot\\Attachments\\EmployeeImages\\23f45e89-8b5a-5c55-9df7-240d78a3ce15.png
+
+
+
+            using (var stream = new FileStream(filePath, FileMode.Create))// Auto Dispose Connection
+            {
+                Image.CopyTo(stream);// Copy Image To File Stream
+            }
+
+            return Path.Combine(imagesFolderPath, fileName);
 
         }
     }

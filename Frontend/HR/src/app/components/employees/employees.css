@@ -20,3 +20,21 @@
     height: 3rem;
     border-radius: 2rem;
 }
+
+
+.remove-image-icon{
+    cursor: pointer;
+    font-size: 0.8rem;
+    color: red;
+    margin: 0px 0.3rem;
+}
+
+.emp-img{
+    width: 3rem;
+    height: 3rem;
+    /* background-image: url(https://localhost:44324/Atttachments/EmployeeImages/472cdf1d-7a2b-4db8-8c71-b503ec8babc5.jpg); */
+    display: inline-block;
+    background-size: cover;
+    background-position: center;
+    border-radius: 50%;
+}

@@ -78,9 +78,10 @@
                         <tr>
                             <td>{{i + 1}}</td>
                             <td>
-                                <img class="employee-image"
-                                src="https://www.davd.photo/wp-content/uploads/2019/03/rocco-roxie-employee-headshots-4.jpg"
-                                 alt="Employee Image">
+                                <span class="emp-img" [style.background-image]=" `url(${employee.imagePath})`"></span>
+                                <!-- <img class="employee-image"
+                                [src]="employee.imagePath"
+                                 alt="Employee Image"> -->
                             </td>
                             <td>{{employee.name}}</td>
                             <td>{{employee.phone}}</td>
@@ -185,7 +186,10 @@
 
                 <div class="col-lg-4 col-md-4 col-sm-12 mb-2">
                     <label for="empImage" class="form-label">Image</label>
-                    <input class="form-control form-control-sm" accept="image/*"
+                    @if(employeeForm.get('IsImage')?.value){
+                        <i (click)="removeImage()" class="bi bi-x-circle remove-image-icon"></i>
+                    }      
+                    <input class="form-control form-control-sm" accept="image/*" #empImageInput
                     (change)="uploadImage($event)" id="empImage" type="file">
                 </div>
 
