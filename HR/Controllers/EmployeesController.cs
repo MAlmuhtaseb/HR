@@ -9,7 +9,7 @@ using HR.Enums;
 
 namespace HR.Controllers
 {
-    //[Authorize] // Authentication / Authorization
+    [Authorize] // Authentication / Authorization
     [Route("api/Employees")]// --> Data Annotation
     [ApiController]// --> Data Annotation
     public class EmployeesController : ControllerBase

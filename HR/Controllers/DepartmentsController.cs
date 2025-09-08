@@ -9,7 +9,7 @@ using System.Linq;
 
 namespace HR.Controllers
 {
-    //[Authorize]
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class DepartmentsController : ControllerBase

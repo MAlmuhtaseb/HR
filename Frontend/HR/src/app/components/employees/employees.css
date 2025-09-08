@@ -11,9 +11,7 @@
     align-items: flex-end;
 }
 
-.invalid-input{
-    border-color: red;
-}
+
 
 .employee-image{
     width: 4rem;

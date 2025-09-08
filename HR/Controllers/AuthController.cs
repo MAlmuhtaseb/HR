@@ -46,7 +46,8 @@ namespace HR.Controllers
 
                 var token = GenerateJwtToken(user);
 
-                return Ok(token);
+                return Ok(new { token = token});
+               // return Ok(token);
             }
             catch (Exception ex)
             {

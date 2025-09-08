@@ -20,3 +20,8 @@ html{
     }
 
 }
+
+
+.invalid-input{
+    border-color: red;
+}
