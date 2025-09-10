@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { FormControl, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms'
 import { AuthService } from '../../services/auth.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-login',
@@ -10,7 +11,12 @@ import { AuthService } from '../../services/auth.service';
 })
 export class Login {
 
-  constructor(private _authService : AuthService){
+  showErrorMessage : boolean = false;
+  errorMessage : string = "";
+
+  constructor(private _authService : AuthService,
+    private _router: Router
+  ){
 
   }
 
@@ -31,9 +37,13 @@ export class Login {
       next: (res : any) => {
         //console.log(res); // token
         localStorage.setItem("token", res.token);
+        localStorage.setItem("role", res.role);
+        this.showErrorMessage = false;
+        this._router.navigate(["/"]);
       },
       error: err => {
-        console.log(err.error.message ?? err.error ?? "Unexpected Error");
+        this.showErrorMessage = true;
+       this.errorMessage = err.error.message ?? err.error ?? "Unexpected Error";
       }
     })
   }

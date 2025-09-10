@@ -29,3 +29,8 @@
 .btn{
     width: 100%;
 }
+
+.err-message{
+    color: red;
+    margin: 0.5rem 0;
+}

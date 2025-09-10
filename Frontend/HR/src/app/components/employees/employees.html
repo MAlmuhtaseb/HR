@@ -58,7 +58,7 @@
             </div>
             <div>
                 <button type="button" class="btn btn-outline-secondary" (click)="loadSaveDialog();"
-                 data-bs-toggle="modal" data-bs-target="#saveEmployeeModal">
+                 data-bs-toggle="modal" data-bs-target="#saveEmployeeModal" [disabled]="addButtonDisabled">
                     <i class="bi bi-person-plus-fill"></i>
                     <span> Add</span>
                 </button>

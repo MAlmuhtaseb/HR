@@ -46,8 +46,7 @@ namespace HR.Controllers
 
                 var token = GenerateJwtToken(user);
 
-                return Ok(new { token = token});
-               // return Ok(token);
+                return Ok(token);
             }
             catch (Exception ex)
             {
@@ -56,8 +55,9 @@ namespace HR.Controllers
             
         }
 
-        private string GenerateJwtToken(User user)
+        private TokenDto GenerateJwtToken(User user)
         {
+            string role;
             var claims = new List<Claim>(); // User Info 
 
             //Key --> Value
@@ -68,11 +68,14 @@ namespace HR.Controllers
             if (user.IsAdmin)
             {
                 claims.Add(new Claim(ClaimTypes.Role, "Admin"));
+                role = "Admin";
             }
             else
             {
                 var employee = _dbContext.Employees.Include(x => x.Lookup).FirstOrDefault(x => x.UserId == user.Id);
                 claims.Add(new Claim(ClaimTypes.Role, employee.Lookup.Name));
+
+                role = employee.Lookup.Name;
             }
 
 
@@ -88,7 +91,7 @@ namespace HR.Controllers
             var tokenHandler = new JwtSecurityTokenHandler();
             var token = tokenHandler.WriteToken(tokenSettings);
 
-            return token;
+            return new TokenDto { Token = token, Role = role};
 
         }
 

@@ -32,6 +32,7 @@ export class Employees implements OnInit  {
   positions : List[] = [];
 
   managers : List[] = [];
+  addButtonDisabled : boolean = false;
   
   employeeStatusList: List[] = [
     {id: null, name : "Select Status"},
@@ -77,6 +78,7 @@ export class Employees implements OnInit  {
   ngOnInit(): void { // Life Cycle Hook
     this.loadEmployees();
     this.loadPositionsList();
+    this.checkRole();
   }
   
   ngOnDestroy(){
@@ -323,6 +325,15 @@ export class Employees implements OnInit  {
     this.loadManagersList(employeeId);
     this.loadDepartmentsList();
     this.loadPositionsList();
+  }
+
+  checkRole(){
+
+    let role = localStorage.getItem("role");
+
+    if(role?.toUpperCase() != "ADMIN" && role?.toUpperCase() != "HR"){
+      this.addButtonDisabled = true;
+    }
   }
 
 }

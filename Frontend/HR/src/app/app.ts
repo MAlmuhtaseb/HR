@@ -32,4 +32,10 @@ export class App {
     return this.router.url !== '/login'
   }
 
+  signOut(){
+    // Remove token from local storage
+    localStorage.removeItem("token");
+    // Re direct to login page
+    this.router.navigate(["/login"]);
+  }
 }

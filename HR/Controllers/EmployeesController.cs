@@ -1,11 +1,10 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using HR.Model;
-using HR.DTOs.Employees;
-using System.Linq;
-using Microsoft.AspNetCore.Authorization;
+﻿using HR.DTOs.Employees;
 using HR.DTOs.Shared;
 using HR.Enums;
+using HR.Model;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace HR.Controllers
 {
@@ -26,12 +25,16 @@ namespace HR.Controllers
             _config = config;
         }
 
-        //[Authorize(Roles = "HR,Admin")]
+        
         [HttpGet("GetAll")]// --> Data Annotation
         public IActionResult GetAll([FromQuery] FilterEmployeeDto filterDto) // Postion Is Optional // Query Parameter
         {
             try
             {
+                // Extracted From Token
+                var role = User.FindFirst(ClaimTypes.Role)?.Value;// Admin, HR, Manager, Dveleoper
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
             var data = from employee in _dbContext.Employees
                        from department in _dbContext.Departments.Where(x => x.Id == employee.DepartmentId).DefaultIfEmpty() // Left Join
                        from manager in _dbContext.Employees.Where(x => x.Id == employee.ManagerId).DefaultIfEmpty() // Left Join
@@ -56,9 +59,16 @@ namespace HR.Controllers
                                 ManagerName = manager.Name,
                                 DepartmentId = employee.DepartmentId,
                                 DepartmentName = department.Name,
-                                ImagePath = employee.ImagePath != null ? Path.Combine(_config["BaseUrl"], employee.ImagePath) : ""
+                                ImagePath = employee.ImagePath != null ? Path.Combine(_config["BaseUrl"], employee.ImagePath) : "",
+                                UserId = employee.UserId
                             };
-            return Ok(data);
+
+                if(role?.ToUpper() != "ADMIN" && role?.ToUpper() != "HR")
+                {
+                    data = data.Where(x => x.UserId == long.Parse(userId));
+                }
+
+                return Ok(data);
             }
             catch (Exception ex)
             {
@@ -99,6 +109,7 @@ namespace HR.Controllers
 
         }
 
+        [Authorize(Roles = "HR,Admin")]
         [HttpPost("Add")]
         public IActionResult Add([FromForm] SaveEmployeeDto employeeDto )
         {
