@@ -25,3 +25,21 @@ html{
 .invalid-input{
     border-color: red;
 }
+
+.table-header{
+    display:flex;
+    align-items: center;
+}
+
+.table-title{
+    flex-grow: 1;
+}
+
+.align-end{
+    align-items: flex-end;
+}
+
+.justify-content-end{
+    display: flex;
+    justify-content: flex-end;
+}

@@ -1,1 +1,176 @@
-<p>departments works!</p>
+<div class="container-fluid">
+    <div class="card">
+        <div class="card-header">
+            <h5>
+                <i class="bi bi-funnel-fill"></i>
+                Filter
+            </h5>
+        </div>
+        <div class="card-body">
+            <div [formGroup]="searchFilterForm">
+                <div class="row">
+                    <div class="col-lg-4 col-md-4 col-sm-12">
+                        <label for="departmentName"
+                            class="form-label">Department Name</label>
+                        <input type="text" class="form-control"
+                            formControlName="Name"
+                            id="departmentName"
+                            placeholder="Name">
+                    </div>
+                    <div class="col-lg-4 col-md-4 col-sm-12">
+                        <label for="floorNumber"
+                            class="form-label">Floor Number</label>
+                        <input type="number" class="form-control"
+                            formControlName="FloorNumber"
+                            id="floorNumber"
+                            placeholder="Floor Number">
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="text-end mt-2">
+                <button type="button" class="btn btn-outline-secondary"
+                    (click)="loadDepartments()">
+                    <i class="bi bi-search"></i>
+                    <span> Search</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mt-2">
+        <div class="card-header table-header">
+            <div class="table-title">
+                <h5>Departments</h5>
+            </div>
+            <div>
+                <button type="button" class="btn btn-outline-secondary"
+                    (click)="loadSaveDialog();"
+                    data-bs-toggle="modal" data-bs-target="#saveDepartmentModal"
+                    [disabled]="addButtonDisabled">
+                    <i class="bi bi-building-fill-add"></i>
+                    <span> Add</span>
+                </button>
+            </div>
+        </div>
+        <div class="card-body">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        @for(col of departmentsTableColumns; track col){
+                        <th>{{col}}</th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @for(department of departments | paginate : paginationConfig
+                    ; track department; let i = $index){
+                    <tr>
+                        <td>{{i + 1}}</td>
+                        <td>{{department.name}}</td>
+                        <td>{{department.floorNumber}}</td>
+                        <td>{{department.typeName}}</td>
+                        <td>{{department.description}}</td>
+
+                        <td>
+                            <div class="justify-content-end">
+                                <button [disabled]="addButtonDisabled"
+                                     (click)="editDepartment(department.id)"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#saveDepartmentModal"
+                                    type="button"
+                                    class="btn btn-outline-success ms-2 me-2">
+                                    <i class="bi bi-pencil-fill"></i>
+                                </button>
+
+                                <button [disabled]="addButtonDisabled"
+                                    (click)="showConfirmDialog(department.id)"
+                                    type="button"
+                                    class="btn btn-outline-danger mx-2">
+                                    <i class="bi bi-trash-fill"></i>
+                                </button>
+                            </div>
+
+                        </td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+            <!-- Component -->
+            <pagination-controls class="text-end"
+                (pageChange)="changePage($event)"></pagination-controls>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal modal-lg fade" id="saveDepartmentModal" tabindex="-1"
+    aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">Save
+                    Department</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form [formGroup]="departmentForm">
+                    <div class="row align-end">
+                        <div class="col-lg-4 col-md-4 col-sm-12 mb-2">
+                            <label for="nameControl"
+                                class="form-label">Name</label>
+                            <input type="text" class="form-control"
+                                id="nameControl" formControlName="Name"
+                                placeholder="Name"
+                                [class.invalid-input]="departmentForm.get('Name')?.invalid && departmentForm.get('Name')?.touched">
+                        </div>
+
+                        <div class="col-lg-4 col-md-4 col-sm-12 mb-2">
+                            <label for="floorNoControl"
+                                class="form-label">Floor Number</label>
+                            <input type="number" class="form-control"
+                                id="floorNoControl" formControlName="FloorNumber"
+                                placeholder="Floor Number">
+                        </div>
+
+                        <div class="col-lg-4 col-md-4 col-sm-12 mb-2">
+                            <label for="typeControl"
+                                class="form-label">Type</label>
+                            <select class="form-select"
+                                aria-label="Default select example"
+                                id="typeControl" formControlName="TypeId"
+                                [class.invalid-input]="departmentForm.get('TypeId')?.invalid && departmentForm.get('TypeId')?.touched">
+                                @for(item of departmentTypes; track item){
+                                <option
+                                    [ngValue]="item.id">{{item.name}}</option>
+                                }
+                            </select>
+                        </div>
+
+                        <div class="col-12 mb-2">
+                             <label for="descriptionControl" class="form-label">Description</label>
+                            <textarea class="form-control" id="descriptionControl" formControlName="Description" rows="2"></textarea>
+                        </div>
+                        
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary"
+                    data-bs-dismiss="modal" #closeButton>Close</button>
+                <button type="button" class="btn btn-primary"
+                    [disabled]="!departmentForm.valid"
+                    (click)="saveDepartment()">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if(showConfirmationDialog){
+<app-confirmation-dialog [title]="deleteDialogTitle" [body]="deleteDialogBody"
+    (confirm)="confrimDepartmentDelete($event)">
+</app-confirmation-dialog>
+}

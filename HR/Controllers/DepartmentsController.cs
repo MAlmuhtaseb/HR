@@ -73,7 +73,7 @@ namespace HR.Controllers
             }
 
         }
-
+        [Authorize(Roles = "HR,Admin")]
         [HttpPost("Add")]
         public IActionResult Add([FromBody] SaveDeaprtmentDto departmentDto)
         {
@@ -98,7 +98,7 @@ namespace HR.Controllers
             }
 
         }
-
+        [Authorize(Roles = "HR,Admin")]
         [HttpPut("Update")]
         public IActionResult Update([FromBody] SaveDeaprtmentDto departmentDto)
         {
@@ -124,7 +124,7 @@ namespace HR.Controllers
             }
     
         }
-
+        [Authorize(Roles = "HR,Admin")]
         [HttpDelete("Delete")]
         public IActionResult Delete([FromQuery] long Id)
         {
@@ -137,7 +137,13 @@ namespace HR.Controllers
                 return BadRequest("Department Does Not Exist");
             }
 
-            _dbContext.Departments.Remove(department);
+            var employeeAssociate = _dbContext.Employees.FirstOrDefault(x => x.DepartmentId == Id); // Department Has Employees
+             if (employeeAssociate != null)
+             {
+                return BadRequest("Department with assigned employees cannot be deleted.");
+             }
+
+                _dbContext.Departments.Remove(department);
             _dbContext.SaveChanges();
             return Ok();
             }
