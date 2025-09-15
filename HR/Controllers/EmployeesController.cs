@@ -258,6 +258,26 @@ namespace HR.Controllers
 
         }
 
+        [HttpGet("GetEmployeeList")]
+        public IActionResult GetEmployeeList([FromQuery] bool? currentUserOnly)
+        {
+
+            var data = _dbContext.Employees.Where(x => x.IsActive);
+
+            if (currentUserOnly == true)// check if you want to return the current user only
+            {
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                data = data.Where(x => x.UserId == long.Parse(userId));
+            }
+            
+            var employees = data.Select(x => new ListDto
+            {
+                Id = x.Id,
+                Name = x.Name,
+            });
+            return Ok(data);
+        }
+
 
         private string UploadImage(IFormFile Image)
         {
